@@ -287,6 +287,17 @@ class Application extends BaseApplication
                     )
                 );
             }
+
+            //FIXME: register interceptors some where and load this config to overwrite core commands
+            //instead of hard coding that once single interceptor
+            if ($coreCliApplicationCommand instanceof \Magento\Setup\Console\Command\AdminUserCreateCommand) {
+                $configuration = require BP . '/setup/config/application.config.php';
+                $bootstrapApplication = new \Magento\Setup\Application();
+                $application = $bootstrapApplication->bootstrap($configuration);
+                $serviceManager = $application->getServiceManager();
+                $coreCliApplicationCommand = $serviceManager->get(\N98\Magento\Command\Admin\User\Interceptor\AdminUserCreateInterceptor::class);
+            }
+
             $this->add($coreCliApplicationCommand);
         }
     }
